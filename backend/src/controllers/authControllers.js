@@ -125,6 +125,7 @@ const loginPatient = async(req,res)=>{
             success: false,
             message: "Invalid email or password",
         });
+        }
 
         const isPasswordValid = await bcrypt.compare(
             password,
@@ -134,7 +135,7 @@ const loginPatient = async(req,res)=>{
         if(!isPasswordValid){
             return res.status(401).json({
                 success:false,
-                meassage:"Invalid email or password",
+                message:"Invalid email or password",
             });
         }
 
@@ -156,9 +157,8 @@ const loginPatient = async(req,res)=>{
                 email:patient.email,
             },
         });
-    }
-  }catch(error){
-    console.error("Patient login failed:",error.meassage);
+    }catch(error){
+    console.error("Patient login failed:",error.message);
     
     return res.status(500).json({
       success: false,
@@ -167,4 +167,40 @@ const loginPatient = async(req,res)=>{
   }
 }
 
-module.exports={registerPatient, loginPatient};
+
+const getCurrentPatient = async (req, res) => {
+  try {
+    // req.patientId is set by our authentication middleware
+    const patient = await Patient.findById(req.patientId);
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      patient: {
+        id: patient._id,
+        name: patient.name,
+        email: patient.email,
+        dateOfBirth: patient.dateOfBirth,
+        medicalHistory: patient.medicalHistory,
+        allergies: patient.allergies,
+        createdAt: patient.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error("Fetching patient profile failed:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to fetch patient profile",
+    });
+  }
+};
+
+
+module.exports={registerPatient, loginPatient, getCurrentPatient};
