@@ -5,6 +5,8 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const emergencyContactRoutes = require("./routes/emergencyContactRoutes");
+const prescriptionRoutes = require("./routes/prescriptionRoutes");
+const uploadErrorMiddleware = require("./middlewares/uploadErrorMiddleware");
 
 const app = express();
 
@@ -20,8 +22,12 @@ app.use(express.json());
 //Authentication routes
 app.use("/api/v1/auth",authRoutes);
 
+
+
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/emergency-contacts", emergencyContactRoutes);
+app.use("/api/v1/prescriptions", prescriptionRoutes);
+app.use(uploadErrorMiddleware);
 
 // Health-check route
 app.get("/api/v1/health", (req, res) => {
